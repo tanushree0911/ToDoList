@@ -1,0 +1,13 @@
+<form [formGroup]="editForm" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Task Title</mat-label>
+      <input matInput formControlName="title">
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-button type="button" (click)="cancel.emit()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="editForm.invalid">
+        Save Changes
+      </button>
+    </div>
+</form>
