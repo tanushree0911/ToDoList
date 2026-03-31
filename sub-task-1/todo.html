@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Data Table</title>
+    <!-- <style link="styles.css"></style> -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end;">
+        <div style="flex-grow: 1;">
+            <label for="searchInput" style="display: block; font-weight: bold; margin-bottom: 5px;">Filter Description:</label>
+            <input type="text" id="searchInput" placeholder="Search tasks..." 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        
+        <button onclick="applyFilter()" 
+                style="padding: 10px 20px; background-color: rgb(200, 6, 200); color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Apply
+        </button>
+    
+        <button onclick="clearFilter()" 
+                style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Reset
+        </button>
+    </div>
+
+    <div id="table-container">
+        <!-- <h2>User To-Do List</h2>
+        <div id="table-actions" style="margin-bottom: 10px;">
+            <button id="bulk-delete-btn" class="delete-btn" onclick="deleteSelected()" disabled>
+                🗑️ Delete Selected
+            </button>
+        </div> -->
+        <table id="todoTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all" onclick="toggleAll(this)"></th>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="todoBody"></tbody>
+        </table>
+    </div>
+    
+    <div id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div id="side-drawer">
+        <div class="drawer-header">
+            <h3>Edit Task</h3>
+            <button onclick="closeDrawer()">×</button>
+        </div>
+        <form id="edit-form">
+            <input type="hidden" id="edit-index">
+            
+            <label>Task ID</label>
+            <input type="text" id="edit-id" disabled>
+    
+            <label>Description</label>
+            <textarea id="edit-title" rows="4"></textarea>
+    
+            <label>Status</label>
+            <select id="edit-status">
+                <option value="true">Completed</option>
+                <option value="false">Pending</option>
+            </select>
+    
+            <button type="button" class="save-btn" onclick="saveEntry()">Save Changes</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
