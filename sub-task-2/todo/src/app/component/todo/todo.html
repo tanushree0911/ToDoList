@@ -23,29 +23,33 @@
       <div class="main-content-wrapper">
 
         <div class="filter-section mat-elevation-z2">
-            <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Filter by Title</mat-label>
-              <input matInput 
-                     placeholder="Enter keywords (e.g. 'delectus')" 
-                     #filterInput
-                     (keyup.enter)="applyTitleFilter(filterInput.value)">
-              <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
-          
-            <div class="filter-actions">
-              <button mat-flat-button 
-                      color="primary" 
-                      (click)="applyTitleFilter(filterInput.value)">
-                Apply Filter
-              </button>
-              
-              <button mat-stroked-button 
-                      color="basic" 
-                      (click)="resetFilter(filterInput)">
-                Cancel / Reset
-              </button>
-            </div>
-        </div>
+          <!-- <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search Title</mat-label>
+            <input matInput #titleInput placeholder="e.g. 'delectus'">
+          </mat-form-field> -->
+      
+          <mat-form-field appearance="outline">
+            <mat-label>From Date</mat-label>
+            <input matInput type="date" #startInput>
+          </mat-form-field>
+      
+          <mat-form-field appearance="outline">
+            <mat-label>To Date</mat-label>
+            <input matInput type="date" #endInput>
+          </mat-form-field>
+        
+          <div class="filter-actions">
+            <button mat-flat-button color="primary" 
+                    (click)="applyFilters(startInput.value, endInput.value)">
+              Apply
+            </button>
+            
+            <button mat-stroked-button color="basic" 
+                    (click)="resetAllFilters(startInput, endInput)">
+              Reset
+            </button>
+          </div>
+      </div>
         
         <!-- <div class="table-header-actions">
           <h1>Task Management</h1>
@@ -90,6 +94,13 @@
             <ng-container matColumnDef="title">
               <th mat-header-cell *matHeaderCellDef> Description </th>
               <td mat-cell *matCellDef="let row"> {{row.title}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef> Created Date </th>
+              <td mat-cell *matCellDef="let row"> 
+                {{ row.createdAt | date:'mediumDate' }} 
+              </td>
             </ng-container>
   
             <ng-container matColumnDef="completed">

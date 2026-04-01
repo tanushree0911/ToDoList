@@ -31,7 +31,7 @@ import { MatInputModule } from '@angular/material/input';
 export class Todo {
 
   private todoService = inject(TodoService);
-  displayedColumns: string[] = ['select', 'title', 'completed', 'delete'];
+  displayedColumns: string[] = ['select', 'title', 'createdAt', 'completed', 'delete'];
   dataSource = new MatTableDataSource<TodoItem>([]);
   selection = new SelectionModel<Todo>(true, []);
   selectedTodo: TodoItem | null = null;
@@ -40,11 +40,33 @@ export class Todo {
   ngOnInit(): void {
     this.todoService.getTodos().subscribe({
       next: (data) => {
-        this.dataSource.data = data;
-        this.originalData = data; // Keep a backup for "Cancel"
-      },
-      error: (err) => console.error('Store error:', err)
+        const start = new Date('2025-01-01').getTime();
+        const end = new Date('2025-07-01').getTime();
+  
+        const dataWithDates = data.map(item => ({
+          ...item,
+          createdAt: new Date(Math.floor(Math.random() * (end - start + 1) + start))
+        }));
+  
+        this.originalData = [...dataWithDates];
+        this.dataSource.data = this.originalData;
+        this.setupFilter();
+      }
     });
+  }
+
+  setupFilter() {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      if (!filter) return true;
+  
+      const search = JSON.parse(filter);
+      
+      const todoTime = new Date(data.createdAt).getTime();
+      const matchesStart = !search.start || todoTime >= new Date(search.start).getTime();
+      const matchesEnd = !search.end || todoTime <= new Date(search.end).getTime();
+  
+      return matchesStart && matchesEnd;
+    };
   }
 
   editTodo(todo: TodoItem) {
@@ -81,7 +103,6 @@ export class Todo {
   }
 
   handleSave(updatedTask: any, drawer: any) {
-    // Update the local data source
     const index = this.dataSource.data.findIndex(t => t.id === updatedTask.id);
     if (index !== -1) {
       const newData = [...this.dataSource.data];
@@ -91,22 +112,18 @@ export class Todo {
     drawer.close();
   }
 
-  applyTitleFilter(searchTerm: string) {
-    const cleanTerm = searchTerm.toLowerCase().trim();
-  
-    if (!cleanTerm) {
-      this.dataSource.data = [...this.originalData];
-      return;
-    }
-  
-    this.dataSource.data = this.originalData.filter(todo => 
-      todo.title.toLowerCase().includes(cleanTerm)
-    );
+  applyFilters(start?: string, end?: string) {
+    const filterValue = {
+      start: start || null,
+      end: end || null
+    };
+    this.dataSource.filter = JSON.stringify(filterValue);
   }
-  
-  resetFilter(inputElement: HTMLInputElement) {
-    inputElement.value = '';
-    this.dataSource.data = [...this.originalData];
+
+  resetAllFilters(startInput: HTMLInputElement, endInput: HTMLInputElement) {
+    startInput.value = '';
+    endInput.value = '';
+    this.dataSource.filter = JSON.stringify({ title: '', start: null, end: null });
   }
 
 }
