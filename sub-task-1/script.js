@@ -1,20 +1,33 @@
 let allTodos = [];
 let activeSearchTerm = "";
+let activeDateRange = { start: null, end: null };
 
 async function fetchTodos() {
     const res = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=20');
-    allTodos = await res.json();
+    const data = await res.json();
+
+    const start = new Date('2025-01-01').getTime();
+    const end = new Date('2025-07-01').getTime();
+
+    allTodos = data.map(todo => {
+        const randomTimestamp = Math.floor(Math.random() * (end - start + 1) + start);
+        return {
+            ...todo,
+            selected: false,
+            createdDate: new Date(randomTimestamp)
+        };
+    });
+
     renderTable();
 }
 
 function openDrawer(index) {
     const todo = allTodos[index];
     
-    // Fill the form with current data
     document.getElementById('edit-index').value = index;
-    document.getElementById('edit-id').value = todo.id;
+    // document.getElementById('edit-id').value = todo.id;
     document.getElementById('edit-title').value = todo.title;
-    document.getElementById('edit-status').value = todo.completed.toString();
+    // document.getElementById('edit-status').value = todo.completed.toString();
 
     // Show drawer and overlay
     document.getElementById('side-drawer').classList.add('open');
@@ -30,7 +43,7 @@ function saveEntry() {
     const index = document.getElementById('edit-index').value;
     
     allTodos[index].title = document.getElementById('edit-title').value;
-    allTodos[index].completed = document.getElementById('edit-status').value === 'true';
+    // allTodos[index].completed = document.getElementById('edit-status').value === 'true';
 
     renderTable();
     closeDrawer(); 
@@ -68,14 +81,23 @@ function updateBulkDeleteButton() {
     btn.disabled = !anySelected;
 }
 
-function applyFilter() {
-    const input = document.getElementById('searchInput');
-    activeSearchTerm = input.value.toLowerCase().trim();
+function applyDateFilter() {
+    const startVal = document.getElementById('startDate').value;
+    const endVal = document.getElementById('endDate').value;
+
+    // Convert string inputs ("YYYY-MM-DD") to Date objects for comparison
+    activeDateRange.start = startVal ? new Date(startVal).setHours(0,0,0,0) : null;
+    activeDateRange.end = endVal ? new Date(endVal).setHours(23,59,59,999) : null;
+
     renderTable();
 }
 
 function clearFilter() {
+    document.getElementById('startDate').value = "";
+    document.getElementById('endDate').value = "";
     document.getElementById('searchInput').value = "";
+
+    activeDateRange = { start: null, end: null };
     activeSearchTerm = "";
     renderTable();
 }
@@ -83,20 +105,30 @@ function clearFilter() {
 function renderTable() {
     const tbody = document.getElementById('todoBody');
     
-    const filteredData = allTodos.filter(todo => 
-        todo.title.toLowerCase().includes(activeSearchTerm)
-    );
+    const filteredData = allTodos.filter(todo => {
+        const todoTime = todo.createdDate.getTime();
+        
+        const matchesStart = !activeDateRange.start || todoTime >= activeDateRange.start;
+        const matchesEnd = !activeDateRange.end || todoTime <= activeDateRange.end;
+        
+        const matchesText = todo.title.toLowerCase().includes(activeSearchTerm);
+
+        return matchesStart && matchesEnd && matchesText;
+    });
 
     tbody.innerHTML = filteredData.map(todo => {
         const originalIndex = allTodos.indexOf(todo);
+        const formattedDate = todo.createdDate.toLocaleDateString();
+
         return `
-            <tr class="${todo.selected ? 'selected' : ''}">
+            <tr>
                 <td>
-                    <input type="checkbox" ${todo.selected ? 'checked' : ''} onclick="toggleRowSelection(${originalIndex})">
+                    <input type="checkbox" ${todo.selected ? 'checked' : ''} onchange="toggleRowSelection(${originalIndex})">
                     <button onclick="openDrawer(${originalIndex})">Edit</button>
                 </td>
                 <td>${todo.id}</td>
                 <td>${todo.title}</td>
+                <td>${formattedDate}</td>
                 <td>${todo.completed ? 'Complete' : 'Pending'}</td>
                 <td>
                     <button class="delete-btn" onclick="deleteSingle(${originalIndex})">Delete</button>
@@ -104,10 +136,6 @@ function renderTable() {
             </tr>
         `;
     }).join('');
-
-    if (filteredData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No records match your filter.</td></tr>';
-    }
 }
 
 fetchTodos();

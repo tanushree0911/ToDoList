@@ -7,16 +7,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end;">
-        <div style="flex-grow: 1;">
-            <label for="searchInput" style="display: block; font-weight: bold; margin-bottom: 5px;">Filter Description:</label>
-            <input type="text" id="searchInput" placeholder="Search tasks..." 
-                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+    <div class="filter-bar" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+        <div>
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">From Date:</label>
+            <input type="date" id="startDate" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
         
-        <button onclick="applyFilter()" 
+        <div>
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">To Date:</label>
+            <input type="date" id="endDate" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    
+        <button onclick="applyDateFilter()" 
                 style="padding: 10px 20px; background-color: rgb(200, 6, 200); color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Apply
+            Filter by Date
         </button>
     
         <button onclick="clearFilter()" 
@@ -38,6 +42,7 @@
                     <th><input type="checkbox" id="select-all" onclick="toggleAll(this)"></th>
                     <th>ID</th>
                     <th>Description</th>
+                    <th>Created Date</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -50,22 +55,24 @@
     <div id="side-drawer">
         <div class="drawer-header">
             <h3>Edit Task</h3>
-            <button onclick="closeDrawer()">×</button>
         </div>
         <form id="edit-form">
             <input type="hidden" id="edit-index">
             
-            <label>Task ID</label>
+            <!-- <label>Task ID</label>
             <input type="text" id="edit-id" disabled>
+
+            <label>Date Created</label>
+            <input type="text" id="edit-created" disabled style="background-color: #f8f9fa; border: 1px solid #ddd;"> -->
     
             <label>Description</label>
             <textarea id="edit-title" rows="4"></textarea>
     
-            <label>Status</label>
+            <!-- <label>Status</label>
             <select id="edit-status">
                 <option value="true">Completed</option>
                 <option value="false">Pending</option>
-            </select>
+            </select> -->
     
             <button type="button" class="save-btn" onclick="saveEntry()">Save Changes</button>
         </form>
